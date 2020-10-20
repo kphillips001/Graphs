@@ -1,3 +1,5 @@
+import random
+
 class User:
     def __init__(self, name):
         self.name = name
@@ -30,12 +32,8 @@ class SocialGraph:
 
     def populate_graph(self, num_users, avg_friendships):
         """
-        Takes a number of users and an average number of friendships
-        as arguments
-
-        Creates that number of users and a randomly distributed friendships
-        between those users.
-
+        Takes a number of users and an average number of friendships as arguments
+        Creates that number of users and a randomly distributed friendships between those users.
         The number of users must be greater than the average number of friendships.
         """
         # Reset graph
@@ -45,20 +43,61 @@ class SocialGraph:
         # !!!! IMPLEMENT ME
 
         # Add users
+        for i in range(0, num_users):
+            self.add_user(f"User {i}")
 
         # Create friendships
+        # Generate all possible friendship combos...store in list
+        possible_friendships = []
+
+        # Avoid duplicates by ensuring num1 < num2
+        # Iterate thru users
+        for user_id in self.users:
+            # Iterate thru range of next user (id+1) thru last
+            for friend_id in range(user_id + 1, self.last_id + 1):
+                possible_friendships.append((user_id, friend_id))
+
+        # Shuffle possible friendships
+        random.shuffle(possible_friendships)
+
+        # Create friendships from the first N pairs of the list
+        # N will be num_users * avg_friendships // 2 (floor division so we don't get float)
+        N = num_users * avg_friendships // 2
+        for i in range(N): 
+            friendship = possible_friendships[i]
+            user_id, friend_id = friendship
+            self.add_friendship(user_id, friend_id)
 
     def get_all_social_paths(self, user_id):
         """
         Takes a user's user_id as an argument
-
         Returns a dictionary containing every user in that user's
         extended network with the shortest friendship path between them.
-
         The key is the friend's ID and the value is the path.
         """
         visited = {}  # Note that this is a dictionary, not a set
         # !!!! IMPLEMENT ME
+        # initialize a queue to keep track of paths
+        queue = []
+        # add user id as a list to queue
+        queue.append([user_id])
+
+        # while queue is not empty...
+        while len(queue) > 0: 
+            current_path = queue.pop(0)
+            current_user = current_path[-1]
+
+            # if current has NOT been visited
+            if current_user not in visited: 
+                # add to visited...user will be key, path will be value
+                visited[current_user] = current_path
+
+                # iterate over current user's friends
+                for friend in sg.friendships[current_user]:
+                    next_path = list(current_path)
+                    next_path.append(friend)
+                    queue.append(next_path)
+
         return visited
 
 

@@ -79,3 +79,5 @@ def earliest_ancestor(ancestors, starting_node):
                 queue.append(new_path)
 
     return current_earliest_ancestor
+
+   
